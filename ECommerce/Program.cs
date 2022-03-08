@@ -9,104 +9,223 @@ namespace ECommerce
     {
         static void Main(string[] args)
         {
-            // Variables
             int appSection = 1;
-            string[] operations = {"Sipariş ekle", "Siparişleri listele", "Müşteri bilgilerini göster"};
+            List<Customer> customers = null;
+            List<Product> products = null;
+            List<Order> orders = null;
             Customer selectedCustomer = null;
-            // Dummy Data
-            List<Customer> customers = new List<Customer>()
-            {
-                new Customer
-                {
-                    Id = Guid.NewGuid().ToString().Substring(0, 8), TcNo = "12345678901", Fullname = "Zeynel KOZAK",
-                    Gsm = "5435434343",
-                    Address = "Istanbul"
-                },
-                new Customer
-                {
-                    Id = Guid.NewGuid().ToString().Substring(0, 8), TcNo = "12345678902", Fullname = "Ahmet Bey",
-                    Gsm = "5325323232",
-                    Address = "Ankara"
-                },
-                new Customer
-                {
-                    Id = Guid.NewGuid().ToString().Substring(0, 8), TcNo = "12345678903", Fullname = "Mehmet Bey",
-                    Gsm = "5215212121",
-                    Address = "Konya"
-                },
-                new Customer
-                {
-                    Id = Guid.NewGuid().ToString().Substring(0, 8), TcNo = "12345678904", Fullname = "Ali Bey",
-                    Gsm = "5105101010",
-                    Address = "Eskişehir"
-                },
-            };
-            List<Product> products = new List<Product>()
-            {
-                new Product {Id = Guid.NewGuid(), Name = "Product 1", Price = 100, Stock = 10},
-                new Product {Id = Guid.NewGuid(), Name = "Product 2", Price = 200, Stock = 12},
-                new Product {Id = Guid.NewGuid(), Name = "Product 3", Price = 300, Stock = 14},
-                new Product {Id = Guid.NewGuid(), Name = "Product 4", Price = 400, Stock = 16},
-                new Product {Id = Guid.NewGuid(), Name = "Product 5", Price = 500, Stock = 18}
-            };
-
+            InitializeData();
+            
             Console.WriteLine("# Müşteri Sipariş Hattı");
             // App Section 1 - Choose customer or add new customer
-            while (appSection == 1)
+            while (true)
             {
-                Console.WriteLine("1. Yeni müşteri oluştur");
-                Console.WriteLine("2. Mevcut müşteri üzerinden işlem yap");
-                Console.Write("İşlem seçiniz: ");
-                string op = Console.ReadLine();
-                if (op == "1")
+                if (appSection == 1)
                 {
-                    Console.Clear();
-                    Console.WriteLine("Müşteri oluştur.");
-                    AddNewCustomer();
-                }
-                else if (op == "2")
-                {
-                    Console.Clear();
-                    GetCustomers();
-                    Console.Write("Müşteri seç: ");
-                    int c = int.Parse(Console.ReadLine());
-                    if (c == 0 || c > customers.Count)
+                    Console.WriteLine("1. Yeni müşteri oluştur");
+                    Console.WriteLine("2. Müşteri listesi");
+                    Console.WriteLine("3. T.C. No ile işlem yap");
+                    Console.Write("İşlem seçiniz: ");
+                    string op = Console.ReadLine();
+                    if (op == "1")
                     {
-                        Console.WriteLine("Listeden müşteri seçiniz.");
+                        Console.Clear();
+                        Console.WriteLine("Müşteri oluştur.");
+                        AddNewCustomer();
+                    }
+                    else if (op == "2")
+                    {
+                        Console.Clear();
+                        DisplayCustomer();
+                        Console.Write("Müşteri seç: ");
+                        int c = int.Parse(Console.ReadLine());
+                        if (c == 0 || c > customers.Count)
+                        {
+                            Console.WriteLine("Listeden müşteri seçiniz.");
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            selectedCustomer = customers[c - 1];
+                            appSection = 2;
+                        }
+                    }
+                    else if (op == "3")
+                    {
+                        Console.Clear();
+                        Console.Write("T.C. No. giriniz: ");
+                        string tc = Console.ReadLine();
+                        Customer customer = customers.SingleOrDefault(c => c.TcNo == tc);
+                        if (customer != null)
+                        {
+                            selectedCustomer = customer;
+                            appSection = 2;
+                            Console.Clear();
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine(tc + " nolu T.C. bulunamadı.");
+                        }
                     }
                     else
                     {
                         Console.Clear();
-                        selectedCustomer = customers[c - 1];
-                        Console.WriteLine("Seçilen müşteri: {0}", selectedCustomer.Fullname);
+                        Console.WriteLine("Lütfen bir işlem seçiniz.");
                     }
+                }
+                else if (appSection == 2)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Seçilen müşteri: {0}", selectedCustomer.FullName);
+                    Console.WriteLine("İşlem Listesi");
+                    Console.WriteLine("1. Sipariş ekle\n2. Sipariş listesi\n3. Müşteri bilgilerini göster\n4. Başka müşteri seç");
+                    Console.Write("İşlem seçiniz: ");
+                    string op = Console.ReadLine();
+                    if (op == "1")
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Sipariş Ekle");
+                    } else if (op == "2")
+                    {
+                        Console.Clear();
+                        DisplayOrder();
+                        Continue();
+                    } else if (op == "3")
+                    {
+                        Console.Clear();
+                        Console.WriteLine("T.C. No.: {0}\nAd Soyad: {1}\nTelefon Numarası: {2}\nAdres: {3}\n", selectedCustomer.TcNo, selectedCustomer.FullName, selectedCustomer.PhoneNumber, selectedCustomer.Address);
+                        Continue();
+                    } else if (op == "4")
+                    {
+                        Console.Clear();
+                        appSection = 1;
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Lütfen geçerli bir işlem seçiniz.");
+                    }
+                }
+            }
+
+            void InitializeData()
+            {
+                customers = new List<Customer>() {
+                    new Customer
+                    {
+                        Id = GenerateGuid(), TcNo = "12345678901", FullName = "Zeynel KOZAK",
+                        PhoneNumber = "5435434343",
+                        Address = "Istanbul"
+                    },
+                    new Customer
+                    {
+                        Id = GenerateGuid(), TcNo = "12345678902", FullName = "Ahmet Bey",
+                        PhoneNumber = "5325323232",
+                        Address = "Ankara"
+                    }
+                };
+                products = new List<Product>() {
+                    new Product() {Id = GenerateGuid(), Name = "Product 1", Price = 100},
+                    new Product() {Id = GenerateGuid(), Name = "Product 2", Price = 120},
+                    new Product() {Id = GenerateGuid(), Name = "Product 3", Price = 150},
+                    new Product() {Id = GenerateGuid(), Name = "Product 4", Price = 175},
+                };
+                orders = new List<Order>() {
+                    new Order() {
+                        Id = GenerateGuid(),
+                        ProductPerOrder = new List<ProductPerOrder>()
+                        {
+                            new ProductPerOrder()
+                            {
+                                Id = GenerateGuid(), Product = products[0], Quantity = 5
+                            },
+                            new ProductPerOrder()
+                            {
+                                Id = GenerateGuid(), Product = products[3], Quantity = 3
+                            },
+                        },
+                        CustomerId = customers[0].Id
+                    },
+                    new Order() {
+                        Id = GenerateGuid(),
+                        ProductPerOrder = new List<ProductPerOrder>()
+                        {
+                            new ProductPerOrder()
+                            {
+                                Id = GenerateGuid(), Product = products[1], Quantity = 1
+                            },
+                            new ProductPerOrder()
+                            {
+                                Id = GenerateGuid(), Product = products[2], Quantity = 2
+                            },
+                        },
+                        CustomerId = customers[1].Id
+                    }
+                };
+            }
+            string GenerateGuid()
+            {
+                string guid = Guid.NewGuid().ToString().Substring(0, 8);
+                return guid;
+            }
+            void DisplayCustomer()
+            {
+                if (customers.Count > 0)
+                {
+                    var table = new ConsoleTable("#", "Ad ve Soyad", "T.C. No.", "Telefon Numarası", "Adres");
+                    for (int i = 0; i < customers.Count; i++)
+                    {
+                        table.AddRow(i + 1, customers[i].FullName, customers[i].TcNo, customers[i].PhoneNumber,
+                            customers[i].Address);
+                    }
+                    table.Write();
                 }
                 else
                 {
-                    Console.Clear();
-                    Console.WriteLine("Lütfen bir işlem seçiniz.");
+                    Console.WriteLine("Hiç müşteri bulunmamaktadır.");
                 }
             }
-
-            // Functions
-            Customer GetCustomer(string tcNo)
+            void DisplayOrder()
             {
-                return customers.SingleOrDefault(c => c.TcNo == tcNo);
-            }
-
-            void GetCustomers()
-            {
-                customers = customers.ToList();
-                var table = new ConsoleTable("#", "Ad ve Soyad", "T.C. No.", "Telefon Numarası", "Adres");
-                for (int i = 0; i < customers.Count; i++)
+                List<Order> ordersByCustomerId = orders.Where(o => o.CustomerId == selectedCustomer.Id).ToList();
+                if (ordersByCustomerId.Count > 0)
                 {
-                    table.AddRow(i + 1, customers[i].Fullname, customers[i].TcNo, customers[i].Gsm,
-                        customers[i].Address);
+                    var table = new ConsoleTable("#", "Sipariş Tarihi", "Ürün Adedi", "Toplam Fiyat");
+                    for (int i = 0; i < ordersByCustomerId.Count; i++)
+                    {
+                        int countProductInOrder = ordersByCustomerId[i].ProductPerOrder.Count;
+                        float totalPriceInOrder = 0;
+                        for (int j = 0; j < ordersByCustomerId[i].ProductPerOrder.Count; j++)
+                        {
+                            totalPriceInOrder = ordersByCustomerId[i].ProductPerOrder[j].Product.Price *
+                                                ordersByCustomerId[i].ProductPerOrder[j].Quantity;
+                        }
+                        table.AddRow(i + 1, ordersByCustomerId[i].CreatedAt, countProductInOrder, totalPriceInOrder);
+                    }
+                    table.Write();
                 }
-
-                table.Write();
+                else
+                {
+                    Console.WriteLine("Sipariş bulunmamaktadır.");
+                }
             }
-
+            void DisplayProduct()
+            {
+                if (products.Count > 0)
+                {
+                    var table = new ConsoleTable("#", "Ürün Adı", "Satış Fiyatı");
+                    for (int i = 0; i < products.Count; i++)
+                    {
+                        table.AddRow(i + 1, products[i].Name, products[i].Price);
+                    }
+                    table.Write();
+                }
+                else
+                {
+                    Console.WriteLine("Ürün bulunmamaktadır.");
+                }
+            }
             void AddNewCustomer()
             {
                 Console.Write("T.C. No.: ");
@@ -126,11 +245,17 @@ namespace ECommerce
                 {
                     customers.Add(new Customer()
                     {
-                        Id = Guid.NewGuid().ToString().Substring(0, 8), Fullname = fullName, Gsm = gsm,
+                        Id = Guid.NewGuid().ToString().Substring(0, 8), FullName = fullName, PhoneNumber = gsm,
                         Address = address, TcNo = tcNo
                     });
+                    Console.Clear();
                     Console.WriteLine("Yeni müşteri oluşturuldu.");
                 }
+            }
+            void Continue()
+            {
+                Console.WriteLine("Devam etmek için ENTER tuşuna basınız.");
+                Console.ReadLine();
             }
         }
     }
@@ -138,25 +263,32 @@ namespace ECommerce
     class Customer
     {
         public string Id { get; set; }
-        public string Fullname { get; set; }
         public string TcNo { get; set; }
-        public string Gsm { get; set; }
+        public string FullName { get; set; }
+        public string PhoneNumber { get; set; }
         public string Address { get; set; }
     }
 
     class Product
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; }
         public string Name { get; set; }
         public float Price { get; set; }
-        public int Stock { get; set; }
+    }
+
+    class ProductPerOrder
+    {
+        public string Id { get; set; }
+        public Product Product { get; set; }
+        public int Quantity { get; set; }
+        public float Price { get; set; }
     }
 
     class Order
     {
-        public Guid Id { get; set; }
-        public Guid CustomerId { get; set; }
-        public List<Product> Products { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public string Id { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public List<ProductPerOrder> ProductPerOrder { get; set; }
+        public string CustomerId { get; set; }
     }
 }
