@@ -17,7 +17,6 @@ namespace ECommerce
             InitializeData();
             
             Console.WriteLine("# Müşteri Sipariş Hattı");
-            // App Section 1 - Choose customer or add new customer
             while (true)
             {
                 if (appSection == 1)
@@ -85,7 +84,8 @@ namespace ECommerce
                     if (op == "1")
                     {
                         Console.Clear();
-                        Console.WriteLine("Sipariş Ekle");
+                        AddNewOrder();
+                        Continue();
                     } else if (op == "2")
                     {
                         Console.Clear();
@@ -251,6 +251,10 @@ namespace ECommerce
                     Console.Clear();
                     Console.WriteLine("Yeni müşteri oluşturuldu.");
                 }
+            }
+            void AddNewOrder()
+            {
+                Console.WriteLine("Sipariş oluştur.");
             }
             void Continue()
             {
