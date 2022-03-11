@@ -9,6 +9,7 @@ namespace ECommerce
     {
         static void Main(string[] args)
         {
+            // Variables
             List<Customer> customers = new List<Customer>();
             List<Product> products = new List<Product>();
             List<Order> orders = new List<Order>();
@@ -20,6 +21,7 @@ namespace ECommerce
             {
                 switch (appSection)
                 {
+                    // Login Section
                     case 1:
                         Console.Clear();
                         Console.WriteLine("# Müşteri Sipariş Hattı");
@@ -42,6 +44,7 @@ namespace ECommerce
                         }
 
                         break;
+                    // Order Secion
                     case 2:
                         Console.Clear();
                         Console.WriteLine("Seçilen müşteri: {0}", selectedCustomer.FullName);
@@ -74,6 +77,7 @@ namespace ECommerce
                 }
             }
 
+            // Initialize dummy data
             void InitializeData()
             {
                 products.Add(new Product() {Id = GenerateGuid(), Name = "Ürün 1", Price = 100, Stock = 10});
@@ -109,13 +113,13 @@ namespace ECommerce
                     }
                 });
             }
-
+            // Generate Id
             string GenerateGuid()
             {
                 string guid = Guid.NewGuid().ToString().Substring(0, 8);
                 return guid;
             }
-
+            // Display data
             void DisplayCustomerList()
             {
                 if (customers.Count > 0)
@@ -134,7 +138,6 @@ namespace ECommerce
                     Console.WriteLine("Hiç müşteri bulunmamaktadır.");
                 }
             }
-
             void DisplayProductList()
             {
                 if (products.Count > 0)
@@ -152,7 +155,6 @@ namespace ECommerce
                     Console.WriteLine("Ürün bulunmamaktadır.");
                 }
             }
-
             void DisplayOrderList()
             {
                 Console.Clear();
@@ -181,7 +183,7 @@ namespace ECommerce
                     Console.WriteLine("Sipariş bulunmamaktadır.");
                 }
             }
-
+            // Add new customer data
             void AddNewCustomer()
             {
                 string tcNo = "";
@@ -270,7 +272,7 @@ namespace ECommerce
                 Console.Clear();
                 Console.WriteLine("Yeni müşteri oluşturuldu.");
             }
-
+            // Choose customer in list to login
             void LoginWithCustomerList()
             {
                 Console.Clear();
@@ -289,7 +291,7 @@ namespace ECommerce
                     appSection = 2;
                 }
             }
-
+            // Write T.C. number to login
             void LoginWithTc()
             {
                 Console.Clear();
@@ -317,7 +319,7 @@ namespace ECommerce
                     }
                 }
             }
-
+            // Display customer detail in order section
             void DisplayCustomerDetail()
             {
                 Console.Clear();
@@ -326,7 +328,7 @@ namespace ECommerce
                     selectedCustomer.Address);
                 Continue();
             }
-
+            // Add new order data
             void AddNewOrder()
             {
                 Console.Clear();
@@ -377,7 +379,7 @@ namespace ECommerce
                     }
                 }
             }
-
+            // Cancel order method
             void CancelOrder()
             {
                 while (true)
@@ -410,20 +412,20 @@ namespace ECommerce
                     }
                 }
             }
-
+            // Check stock wheather there are enough stock
             bool CheckStock(Product product, int quantity)
             {
                 if (product.Stock < quantity)
                     return false;
                 return true;
             }
-
+            // Pause application
             void Continue()
             {
                 Console.WriteLine("Devam etmek için ENTER tuşuna basınız.");
                 Console.ReadLine();
             }
-
+            // Exit application
             void Exit()
             {
                 Console.WriteLine("Güle güle...");
