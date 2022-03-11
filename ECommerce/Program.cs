@@ -15,15 +15,16 @@ namespace ECommerce
             Customer selectedCustomer = null;
             InitializeData();
             int appSection = 1;
-            
+
             while (true)
             {
                 switch (appSection)
                 {
-                    case 1: 
+                    case 1:
                         Console.Clear();
                         Console.WriteLine("# Müşteri Sipariş Hattı");
-                        Console.WriteLine("1. Yeni müşteri oluştur\n2. Müşteri seç\n3. T.C. No ile işlem yap\n4. Çıkış");
+                        Console.WriteLine(
+                            "1. Yeni müşteri oluştur\n2. Müşteri seç\n3. T.C. No ile işlem yap\n4. Çıkış");
                         Console.Write("İşlem seçiniz: ");
                         string op1 = Console.ReadLine();
                         if (op1 == "1")
@@ -39,24 +40,30 @@ namespace ECommerce
                             Console.Clear();
                             Console.WriteLine("İşlem seçiniz!");
                         }
+
                         break;
                     case 2:
                         Console.Clear();
                         Console.WriteLine("Seçilen müşteri: {0}", selectedCustomer.FullName);
                         Console.WriteLine("İşlem Listesi");
                         Console.WriteLine(
-                            "1. Sipariş oluştur\n2. Sipariş listesi\n3. Müşteri bilgilerini göster\n4. Başka müşteri seç\n5. Çıkış");
+                            "1. Sipariş oluştur\n2. Sipariş listesi\n3. Siparişi iptal et\n4. Müşteri bilgilerini göster\n5. Başka müşteri seç\n6. Çıkış");
                         Console.Write("İşlem seçiniz: ");
                         string op2 = Console.ReadLine();
                         if (op2 == "1")
                             AddNewOrder();
                         else if (op2 == "2")
+                        {
                             DisplayOrderList();
+                            Continue();
+                        }
                         else if (op2 == "3")
-                            DisplayCustomerDetail();
+                            CancelOrder();
                         else if (op2 == "4")
-                            appSection = 1;
+                            DisplayCustomerDetail();
                         else if (op2 == "5")
+                            appSection = 1;
+                        else if (op2 == "6")
                             Exit();
                         else
                         {
@@ -66,31 +73,41 @@ namespace ECommerce
                         break;
                 }
             }
-            
+
             void InitializeData()
             {
                 products.Add(new Product() {Id = GenerateGuid(), Name = "Ürün 1", Price = 100, Stock = 10});
                 products.Add(new Product() {Id = GenerateGuid(), Name = "Ürün 2", Price = 110, Stock = 12});
                 products.Add(new Product() {Id = GenerateGuid(), Name = "Ürün 3", Price = 120, Stock = 14});
                 products.Add(new Product() {Id = GenerateGuid(), Name = "Ürün 4", Price = 130, Stock = 16});
-                customers.Add(new Customer() {
-                    Id = GenerateGuid(), FullName = "Müşteri 1",TcNo = "12345678912",PhoneNumber = "5435434343",Address = "İstanbul"
+                customers.Add(new Customer()
+                {
+                    Id = GenerateGuid(), FullName = "Müşteri 1", TcNo = "12345678912", PhoneNumber = "5435434343",
+                    Address = "İstanbul"
                 });
-                customers.Add(new Customer() {
-                    Id = GenerateGuid(), FullName = "Müşteri 2",TcNo = "12345678913",PhoneNumber = "5325323232",Address = "Ankara"
-                }); 
-                orders.Add(new Order() {Id = GenerateGuid(), CustomerId = customers[0].Id,
+                customers.Add(new Customer()
+                {
+                    Id = GenerateGuid(), FullName = "Müşteri 2", TcNo = "12345678913", PhoneNumber = "5325323232",
+                    Address = "Ankara"
+                });
+                orders.Add(new Order()
+                {
+                    Id = GenerateGuid(), CustomerId = customers[0].Id,
                     Products = new List<ProductInOrder>()
                     {
-                        new ProductInOrder(){Id = GenerateGuid(),ProductId = products[0].Id,Quantity = 5},
-                        new ProductInOrder(){Id = GenerateGuid(),ProductId = products[1].Id,Quantity = 3}
-                    }});
-                orders.Add(new Order() {Id = GenerateGuid(), CustomerId = customers[1].Id,
+                        new ProductInOrder() {Id = GenerateGuid(), ProductId = products[0].Id, Quantity = 5},
+                        new ProductInOrder() {Id = GenerateGuid(), ProductId = products[1].Id, Quantity = 3}
+                    }
+                });
+                orders.Add(new Order()
+                {
+                    Id = GenerateGuid(), CustomerId = customers[1].Id,
                     Products = new List<ProductInOrder>()
                     {
-                        new ProductInOrder(){Id = GenerateGuid(),ProductId = products[2].Id,Quantity = 8},
-                        new ProductInOrder(){Id = GenerateGuid(),ProductId = products[3].Id,Quantity = 5}
-                    }});
+                        new ProductInOrder() {Id = GenerateGuid(), ProductId = products[2].Id, Quantity = 8},
+                        new ProductInOrder() {Id = GenerateGuid(), ProductId = products[3].Id, Quantity = 5}
+                    }
+                });
             }
 
             string GenerateGuid()
@@ -117,7 +134,7 @@ namespace ECommerce
                     Console.WriteLine("Hiç müşteri bulunmamaktadır.");
                 }
             }
-            
+
             void DisplayProductList()
             {
                 if (products.Count > 0)
@@ -138,6 +155,7 @@ namespace ECommerce
 
             void DisplayOrderList()
             {
+                Console.Clear();
                 List<Order> ordersByCustomer = orders.Where(o => o.CustomerId == selectedCustomer.Id).ToList();
                 if (ordersByCustomer.Count > 0)
                 {
@@ -149,26 +167,28 @@ namespace ECommerce
                         for (int j = 0; j < ordersByCustomer[i].Products.Count; j++)
                         {
                             ProductInOrder pForSelected = ordersByCustomer[i].Products[j];
-                            totalPriceInOrder += products.SingleOrDefault(p => p.Id == pForSelected.ProductId).Price * pForSelected.Quantity;
+                            totalPriceInOrder += products.SingleOrDefault(p => p.Id == pForSelected.ProductId).Price *
+                                                 pForSelected.Quantity;
                         }
+
                         table.AddRow(i + 1, ordersByCustomer[i].CreatedAt, countProductInOrder, totalPriceInOrder);
                     }
+
                     table.Write();
                 }
                 else
                 {
                     Console.WriteLine("Sipariş bulunmamaktadır.");
                 }
-                Continue();
             }
-            
+
             void AddNewCustomer()
             {
                 string tcNo = "";
                 string fullName = "";
                 string phoneNumber = "";
                 string address = "";
-                
+
                 Console.Clear();
                 Console.WriteLine("## Yeni müşteri oluştur ##");
                 // TC No.
@@ -183,7 +203,7 @@ namespace ECommerce
                             Console.WriteLine("Geçerli bir T.C. numarası giriniz.");
                         }
                         else
-                        { 
+                        {
                             tcNo = input.ToString();
                             break;
                         }
@@ -193,6 +213,7 @@ namespace ECommerce
                         Console.WriteLine("Geçerli bir T.C. numarası giriniz.");
                     }
                 }
+
                 // Full Name
                 while (true)
                 {
@@ -208,6 +229,7 @@ namespace ECommerce
                         break;
                     }
                 }
+
                 // Phone Number
                 while (true)
                 {
@@ -223,6 +245,7 @@ namespace ECommerce
                         break;
                     }
                 }
+
                 // Address
                 while (true)
                 {
@@ -238,14 +261,14 @@ namespace ECommerce
                         break;
                     }
                 }
-                
+
                 customers.Add(new Customer()
                 {
-                    Id = Guid.NewGuid().ToString().Substring(0, 8), FullName = fullName, PhoneNumber = phoneNumber, 
+                    Id = Guid.NewGuid().ToString().Substring(0, 8), FullName = fullName, PhoneNumber = phoneNumber,
                     Address = address, TcNo = tcNo
-                }); 
-                Console.Clear(); 
-                Console.WriteLine("Yeni müşteri oluşturuldu."); 
+                });
+                Console.Clear();
+                Console.WriteLine("Yeni müşteri oluşturuldu.");
             }
 
             void LoginWithCustomerList()
@@ -291,7 +314,7 @@ namespace ECommerce
                     {
                         Console.Clear();
                         Console.WriteLine(tc + " nolu T.C. bulunamadı.");
-                    }   
+                    }
                 }
             }
 
@@ -307,7 +330,8 @@ namespace ECommerce
             void AddNewOrder()
             {
                 Console.Clear();
-                Order newOrder = new Order(){Id = GenerateGuid(), CustomerId = selectedCustomer.Id,Products = new List<ProductInOrder>()};
+                Order newOrder = new Order()
+                    {Id = GenerateGuid(), CustomerId = selectedCustomer.Id, Products = new List<ProductInOrder>()};
                 Console.WriteLine("## Sipariş oluştur ##");
                 while (true)
                 {
@@ -315,7 +339,11 @@ namespace ECommerce
                     Console.Write("Sipariş etmek istediğiniz ürünü seçiniz (İptal için Q): ");
                     string p = Console.ReadLine();
                     if (p.ToLower() == "q")
+                    {
+                        orders.Add(newOrder);
                         break;
+                    }
+
                     try
                     {
                         if (int.Parse(p) > 0 && int.Parse(p) - 1 < products.Count)
@@ -329,7 +357,6 @@ namespace ECommerce
                                     {Id = GenerateGuid(), ProductId = product.Id, Quantity = quantity});
                                 product.Stock -= quantity;
                                 Console.WriteLine("Ürün siparişe eklendi.");
-                                orders.Add(newOrder);
                             }
                             else
                             {
@@ -351,13 +378,46 @@ namespace ECommerce
                 }
             }
 
+            void CancelOrder()
+            {
+                while (true)
+                {
+                    List<Order> ordersByCustomer = orders.Where(o => o.CustomerId == selectedCustomer.Id).ToList();
+                    Console.Clear();
+                    DisplayOrderList();
+                    if (ordersByCustomer.Count > 0)
+                    {
+                        Console.Write("İptal etmek istediğiniz siparişi seçiniz (İptal için Q): ");
+                        string o = Console.ReadLine();
+                        if (o.ToLower() == "q")
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            orders.Remove(ordersByCustomer[int.Parse(o) - 1]);
+                            Console.Clear();
+                            Console.WriteLine("Siparişiniz iptal edildi.");
+                            Continue();
+                        }
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Siparişiniz bulunmamaktadır!");
+                        Continue();
+                        break;
+                    }
+                }
+            }
+
             bool CheckStock(Product product, int quantity)
             {
                 if (product.Stock < quantity)
                     return false;
                 return true;
             }
-            
+
             void Continue()
             {
                 Console.WriteLine("Devam etmek için ENTER tuşuna basınız.");
