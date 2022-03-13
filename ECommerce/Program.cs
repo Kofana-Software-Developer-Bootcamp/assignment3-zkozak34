@@ -395,17 +395,25 @@ namespace ECommerce
                             Product product = products[int.Parse(p) - 1];
                             Console.Write("Adet: ");
                             int quantity = int.Parse(Console.ReadLine());
-                            if (CheckStock(product, quantity))
+                            if (quantity > 0)
                             {
-                                newOrder.Products.Add(new ProductInOrder()
-                                    {Id = GenerateGuid(), ProductId = product.Id, Quantity = quantity});
-                                product.Stock -= quantity;
-                                Console.WriteLine("Ürün siparişe eklendi.");
+                                if (CheckStock(product, quantity))
+                                {
+                                    newOrder.Products.Add(new ProductInOrder()
+                                        {Id = GenerateGuid(), ProductId = product.Id, Quantity = quantity});
+                                    product.Stock -= quantity;
+                                    Console.WriteLine("Ürün siparişe eklendi.");
+                                }
+                                else
+                                {
+                                    Console.Clear();
+                                    Console.WriteLine("Yeterli ürün stoğu bulunmamaktadır.");
+                                }
                             }
                             else
                             {
                                 Console.Clear();
-                                Console.WriteLine("Yeterli ürün stoğu bulunmamaktadır.");
+                                Console.WriteLine("Lütfen geçerli bir ürün miktarı giriniz.");
                             }
                         }
                         else
